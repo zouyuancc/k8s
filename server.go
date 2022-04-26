@@ -1,13 +1,10 @@
 package main
 
 import (
-	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
-	"k8s.io/apimachinery/pkg/util/json"
 	"k8s/pkg/parse"
 	yaml_define "k8s/pkg/stru"
-	"log"
 	"strconv"
 )
 
@@ -37,10 +34,5 @@ func parseargs(resp []byte) {
 	conf := new(yaml_define.Yaml)
 	yaml.Unmarshal(resp, conf)
 	//fmt.Println(conf)
-	parse.CreateSource(conf)
-	data, err := json.Marshal(conf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("data:\t", string(data))
+	parse.OperateSource(conf)
 }
