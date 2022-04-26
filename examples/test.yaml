@@ -17,6 +17,6 @@ spec:
         - image: docker.io/tomcat:7
           name: myweb
           ports: 
-            containerPort: 8080
+            containerport: 8080
             other: 8081
             other1: 8082
