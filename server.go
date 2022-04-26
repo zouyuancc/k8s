@@ -5,9 +5,10 @@ import (
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/util/json"
+	"k8s/pkg/parse"
+	yaml_define "k8s/pkg/stru"
 	"log"
 	"strconv"
-	parsedp "test/pkg"
 )
 
 func main() {
@@ -33,10 +34,10 @@ func startServer(port int, done chan bool) {
 
 //解析从client端收过来的信息
 func parseargs(resp []byte) {
-	conf := new(parsedp.Yaml)
+	conf := new(yaml_define.Yaml)
 	yaml.Unmarshal(resp, conf)
 	//fmt.Println(conf)
-	//parsedp.CreateSource(conf)
+	parse.CreateSource(conf)
 	data, err := json.Marshal(conf)
 	if err != nil {
 		log.Fatal(err)
