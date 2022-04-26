@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/pebbe/zmq4"
 	"io/ioutil"
@@ -23,7 +24,8 @@ func startClient(port int, done chan bool, msg []byte) {
 
 func main() {
 	done := make(chan bool)
-	buff, _ := ioutil.ReadFile("/home/zy/GolandProjects/k8s/examples/test.yaml")
+	var file = flag.String("yaml file to send", "examples/test.yaml", "Input your yaml file")
+	buff, _ := ioutil.ReadFile(*file)
 	go startClient(20000, done, buff)
 	<-done
 }
