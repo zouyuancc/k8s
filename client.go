@@ -23,7 +23,7 @@ func startClient(port int, done chan bool, msg []byte) {
 
 func main() {
 	done := make(chan bool)
-	buff, _ := ioutil.ReadFile("/home/zy/k8s/yaml_src/test.yaml")
+	buff, _ := ioutil.ReadFile("/home/zy/GolandProjects/k8s/examples/test.yaml")
 	go startClient(20000, done, buff)
 	<-done
 }

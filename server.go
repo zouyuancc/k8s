@@ -25,6 +25,22 @@ func main() {
 	<-done
 }
 
+//启动zmqserver端
+func startServer(port int, done chan bool) {
+	// REP表示server端
+	socket, _ := zmq.NewSocket(zmq.REP)
+	socket.Bind("tcp://127.0.0.1:" + strconv.Itoa(port))
+	defer socket.Close()
+	for {
+		//Recv 和 Send必须交替进行
+		resp, _ := socket.Recv(0)
+		go parseargs([]byte(resp))
+		socket.Send("Hello "+resp, 0)
+	}
+	done <- true
+}
+
+//解析从client端收过来的信息
 func parseargs(resp []byte) {
 	conf := new(Yaml)
 	yaml.Unmarshal(resp, conf)
@@ -37,6 +53,7 @@ func parseargs(resp []byte) {
 	fmt.Println("data:\t", string(data))
 }
 
+//利用解析得到的结构体信息，创建deployment demo
 func createSource(data *Yaml) {
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
@@ -97,22 +114,7 @@ func createSource(data *Yaml) {
 	fmt.Printf("Create deployment %q.\n", result.GetObjectMeta().GetName())
 }
 
-func startServer(port int, done chan bool) {
-	// REP表示server端
-	socket, _ := zmq.NewSocket(zmq.REP)
-	socket.Bind("tcp://127.0.0.1:" + strconv.Itoa(port))
-	fmt.Printf("bind to port %d\n", port)
-	defer socket.Close()
-	for {
-		//Recv 和 Send必须交替进行
-		fmt.Println("newCurrent")
-		resp, _ := socket.Recv(0)
-		go parseargs([]byte(resp))
-		socket.Send("Hello "+resp, 0)
-	}
-	done <- true
-}
-
+//自定义结构体，用于解析client发过来的yaml文件
 type Yaml struct {
 	Kind     string
 	Metadata struct {

@@ -1,0 +1,22 @@
+kind: Deployment
+metadata:
+  name: myweb
+  labels:
+      app: myweb
+      cpp: web
+spec:
+  replicas: 2
+  selector:
+    app: myweb
+  template:
+    metadata:
+      labels:
+        app: myweb
+    spec:
+      containers:
+        - image: docker.io/tomcat:7
+          name: myweb
+          ports: 
+            containerPort: 8080
+            other: 8081
+            other1: 8082
