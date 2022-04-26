@@ -11,7 +11,7 @@ import (
 )
 
 //利用解析得到的结构体信息，判断资源类型
-func CreateSource(data *yaml_define.Yaml) {
+func OperateSource(data *yaml_define.Yaml) {
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
