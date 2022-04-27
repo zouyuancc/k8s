@@ -1,6 +1,7 @@
 kind: Deployment
 metadata:
   name: myweb
+  namespace: default
   labels:
       app: myweb
       cpp: web
@@ -17,6 +18,4 @@ spec:
         - image: docker.io/tomcat:7
           name: myweb
           ports: 
-            containerport: 8080
-            other: 8081
-            other1: 8082
+            containerPort: 8080

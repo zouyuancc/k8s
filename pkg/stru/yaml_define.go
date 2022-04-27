@@ -2,25 +2,25 @@ package yaml_define
 
 //自定义结构体，用于解析client发过来的yaml文件
 type Yaml struct {
-	Kind     string
+	Kind     string `yaml:"kind"`
 	Metadata struct {
-		Name   string
-		Labels map[string]string
+		Name      string            `yaml:"name"`
+		Namespace string            `yaml:"namespace"`
+		Labels    map[string]string `yaml:"labels"`
 	}
 	Spec struct {
-		Replicas int32
+		Replicas int32 `yaml:"replicas"`
 		Selector map[string]string
 		Template struct {
 			Metadata struct {
-				Name   string
 				Labels map[string]string
 			}
 			Spec struct {
 				Containers []struct {
-					Image string
-					Name  string
+					Image string `yaml:"image"`
+					Name  string `yaml:"name"`
 					Ports struct {
-						Containerport int32
+						ContainerPort int32 `yaml:"containerPort"`
 					}
 				}
 			}

@@ -6,23 +6,13 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	getcfg "k8s/pkg/getconfig"
+	"k8s/pkg/getclientset"
 	yaml_define "k8s/pkg/stru"
 )
 
-func Operate(data *yaml_define.Yaml) {
-	Create(data)
-	//Update(data,config)
-}
-
 //创建deployment
 func Create(data *yaml_define.Yaml) {
-	config := getcfg.Getconfig()
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err)
-	}
+	clientset := getclientset.Getset()
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -44,7 +34,7 @@ func Create(data *yaml_define.Yaml) {
 							Image: data.Spec.Template.Spec.Containers[0].Image,
 							Ports: []apiv1.ContainerPort{
 								{
-									ContainerPort: data.Spec.Template.Spec.Containers[0].Ports.Containerport,
+									ContainerPort: data.Spec.Template.Spec.Containers[0].Ports.ContainerPort,
 								},
 							},
 						},
@@ -59,7 +49,7 @@ func Create(data *yaml_define.Yaml) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("Create deployment %q.\n", result.GetObjectMeta().GetName())
+	fmt.Printf("Deployment %q created. \n", result.GetObjectMeta().GetName()) //%q 单引号围绕的字符字面值，由Go语法安全地转义
 }
 
 //更新deployment
@@ -78,4 +68,15 @@ func Delete(data *yaml_define.Yaml) {
 	//	panic(err)
 	//}
 	//fmt.Println("deleting deployment...")
+}
+
+//判断操作的deployment是否存在
+func Existjudge(data *yaml_define.Yaml) bool {
+	clientset := getclientset.Getset()
+	deploymentName := data.Metadata.Name
+	_, err := clientset.AppsV1().Deployments(data.Metadata.Namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
+	if err != nil {
+		return false
+	}
+	return true
 }

@@ -1,8 +1,8 @@
-package getcfg
+package getclientset
 
 import (
 	"flag"
-	restclient "k8s.io/client-go/rest"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
@@ -11,7 +11,7 @@ import (
 
 var kubeconfig *string
 
-func Getconfig() *restclient.Config {
+func Getset() *kubernetes.Clientset {
 	if kubeconfig == nil {
 		if home := homedir.HomeDir(); home != "" {
 			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -24,5 +24,9 @@ func Getconfig() *restclient.Config {
 	if err != nil {
 		klog.Fatal(err)
 	}
-	return config
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+	return clientset
 }
