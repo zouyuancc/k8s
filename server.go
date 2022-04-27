@@ -33,6 +33,5 @@ func startServer(port int, done chan bool) {
 func parseargs(resp []byte) {
 	conf := new(yaml_define.Yaml)
 	yaml.Unmarshal(resp, conf)
-	//fmt.Println(conf)
 	parse.OperateSource(conf)
 }

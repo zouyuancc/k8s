@@ -7,17 +7,18 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	restclient "k8s.io/client-go/rest"
+	getcfg "k8s/pkg/getconfig"
 	yaml_define "k8s/pkg/stru"
 )
 
-func Operate(data *yaml_define.Yaml, config *restclient.Config) {
-	Create(data, config)
+func Operate(data *yaml_define.Yaml) {
+	Create(data)
 	//Update(data,config)
 }
 
 //创建deployment
-func Create(data *yaml_define.Yaml, config *restclient.Config) {
+func Create(data *yaml_define.Yaml) {
+	config := getcfg.Getconfig()
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err)
@@ -55,13 +56,14 @@ func Create(data *yaml_define.Yaml, config *restclient.Config) {
 	fmt.Println("creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		return
 	}
 	fmt.Printf("Create deployment %q.\n", result.GetObjectMeta().GetName())
 }
 
 //更新deployment
-func Update(data *yaml_define.Yaml, config *restclient.Config) {
+func Update(data *yaml_define.Yaml) {
 	//clientset, err := kubernetes.NewForConfig(config)
 	//if err != nil {
 	//	panic(err)
@@ -70,7 +72,7 @@ func Update(data *yaml_define.Yaml, config *restclient.Config) {
 }
 
 //删除deployment
-func Delete(data *yaml_define.Yaml, config *restclient.Config) {
+func Delete(data *yaml_define.Yaml) {
 	//clientset, err := kubernetes.NewForConfig(config)
 	//if err != nil {
 	//	panic(err)
