@@ -1,4 +1,4 @@
-package dp
+package common
 
 import (
 	"context"
@@ -6,13 +6,12 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s/pkg/getclientset"
-	yaml_define "k8s/pkg/stru"
+	"k8s/pkg"
 )
 
 //创建deployment
-func Create(data *yaml_define.Yaml) {
-	clientset := getclientset.Getset()
+func CreateDeployment(data *pkg.Yaml) {
+	clientset := pkg.Getset()
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -53,7 +52,7 @@ func Create(data *yaml_define.Yaml) {
 }
 
 //更新deployment
-func Update(data *yaml_define.Yaml) {
+func UpdateDeployment(data *pkg.Yaml) {
 	//clientset, err := kubernetes.NewForConfig(config)
 	//if err != nil {
 	//	panic(err)
@@ -62,7 +61,7 @@ func Update(data *yaml_define.Yaml) {
 }
 
 //删除deployment
-func Delete(data *yaml_define.Yaml) {
+func DeleteDeployment(data *pkg.Yaml) {
 	//clientset, err := kubernetes.NewForConfig(config)
 	//if err != nil {
 	//	panic(err)
@@ -71,8 +70,8 @@ func Delete(data *yaml_define.Yaml) {
 }
 
 //判断操作的deployment是否存在
-func Existjudge(data *yaml_define.Yaml) bool {
-	clientset := getclientset.Getset()
+func DeploymentExistJudge(data *pkg.Yaml) bool {
+	clientset := pkg.Getset()
 	deploymentName := data.Metadata.Name
 	_, err := clientset.AppsV1().Deployments(data.Metadata.Namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
 	if err != nil {

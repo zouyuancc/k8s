@@ -1,4 +1,4 @@
-package yaml_define
+package pkg
 
 //自定义结构体，用于解析client发过来的yaml文件
 type Yaml struct {
@@ -21,6 +21,17 @@ type Yaml struct {
 					Name  string `yaml:"name"`
 					Ports struct {
 						ContainerPort int32 `yaml:"containerPort"`
+					}
+					Command   string `yaml:"command"`
+					Resources struct {
+						Requests struct {
+							Memory string `yaml:"memory"`
+							Cpu    string `yaml:"cpu"`
+						}
+						Limits struct {
+							Memory string `yaml:"memory"`
+							Cpu    string `yaml:"cpu"`
+						}
 					}
 				}
 			}

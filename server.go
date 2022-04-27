@@ -3,8 +3,8 @@ package main
 import (
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
-	"k8s/pkg/parse"
-	yaml_define "k8s/pkg/stru"
+	"k8s/common"
+	"k8s/pkg"
 	"strconv"
 )
 
@@ -31,7 +31,15 @@ func startServer(port int, done chan bool) {
 
 //解析从client端收过来的信息
 func parseargs(resp []byte) {
-	conf := new(yaml_define.Yaml)
-	yaml.Unmarshal(resp, conf)
-	parse.OperateSource(conf)
+	data := new(pkg.Yaml)
+	yaml.Unmarshal(resp, data)
+	if data.Kind == "Deployment" {
+		if common.DeploymentExistJudge(data) {
+			common.UpdateDeployment(data)
+		} else {
+			common.CreateDeployment(data)
+		}
+	}
+	if data.Kind == "Service" {
+	}
 }

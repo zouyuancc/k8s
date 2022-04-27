@@ -1,4 +1,4 @@
-package getclientset
+package pkg
 
 import (
 	"flag"

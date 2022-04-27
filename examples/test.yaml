@@ -17,5 +17,13 @@ spec:
       containers:
         - image: docker.io/tomcat:7
           name: myweb
+          command: "while true;do echo hello;sleep 10;done"
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 1
+            limits:
+              memory: 1G
+              cpu: 2
           ports: 
             containerPort: 8080
