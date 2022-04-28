@@ -1,4 +1,4 @@
-package pkg
+package cores
 
 //自定义结构体，用于解析client发过来的yaml文件
 type Yaml struct {

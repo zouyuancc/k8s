@@ -4,7 +4,7 @@ import (
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
 	"k8s/common"
-	"k8s/pkg"
+	"k8s/cores"
 	"strconv"
 )
 
@@ -31,7 +31,7 @@ func startServer(port int, done chan bool) {
 
 //解析从client端收过来的信息
 func parseargs(resp []byte) {
-	data := new(pkg.Yaml)
+	data := new(cores.Yaml)
 	yaml.Unmarshal(resp, data)
 	if data.Kind == "Deployment" {
 		if common.DeploymentExistJudge(data) {

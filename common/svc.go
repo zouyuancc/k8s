@@ -2,7 +2,7 @@ package common
 
 import (
 	restclient "k8s.io/client-go/rest"
-	yaml_define "k8s/pkg"
+	yaml_define "k8s/cores"
 )
 
 func CreateService(data *yaml_define.Yaml, config *restclient.Config) {
