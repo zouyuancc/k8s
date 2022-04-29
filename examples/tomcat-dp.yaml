@@ -21,11 +21,11 @@ spec:
           args: ["-c","while true;do echo hello;sleep 10;done"]
           resources:
             requests:
-              memory: 128Mi
-              cpu: 1
+              memory: "128Mi"
+              cpu: "500m"
             limits:
-              memory: 1G
-              cpu: 2
+              memory: "256Mi"
+              cpu: "1000m"
           ports: 
           - containerPort: 8080
         - image: ustc.mcc.com/library/myapp:v1
@@ -33,10 +33,10 @@ spec:
           command: "while true;do echo hello;sleep 10;done"
           resources:
             requests:
-              memory: 128Mi
-              cpu: 1
+              memory: "128Mi"
+              cpu: "1000"
             limits:
-              memory: 1G
-              cpu: 2
+              memory: "500Mi"
+              cpu: "2000"
           ports:
             containerPort: 8080

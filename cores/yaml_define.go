@@ -1,5 +1,10 @@
 package cores
 
+import (
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+)
+
 //自定义结构体，用于解析client发过来的yaml文件
 type Yaml struct {
 	Kind     string `yaml:"kind"`
@@ -42,5 +47,19 @@ type Yaml struct {
 				}
 			}
 		}
+
+		//Service
+		Type string `yaml:"type"`
+		//Ports []v1.ServicePort
+
+		Ports []struct {
+			TargetPort intstr.IntOrString `yaml:"targetPort,omitempty" protobuf:"bytes,4,opt,name=targetPort"`
+			Name       string             `yaml:"name"`
+			Port       int32              `yaml:"port"`
+			NodePort   int32              `yaml:"nodePort,omitempty" protobuf:"varint,5,opt,name=nodePort"`
+			Protocol   v1.Protocol        `yaml:"protocol"`
+		}
 	}
+	User      string `yaml:"user"`
+	Operation string `yaml:"operation"`
 }

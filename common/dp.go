@@ -26,7 +26,7 @@ func CreateDeployment(data *cores.Yaml) {
 //更新deployment
 func UpdateDeployment(data *cores.Yaml) {
 	clientset := cores.Getset()
-	fmt.Println("updating deployment...")
+	fmt.Printf("updating deployment %q\n", data.Metadata.Name)
 	namespace := data.Metadata.Namespace
 	deployment := dp_trans_to_kubernetes_struct(data)
 	deployment, err := clientset.AppsV1().Deployments(namespace).Update(context.TODO(), deployment, metav1.UpdateOptions{})
@@ -39,11 +39,13 @@ func UpdateDeployment(data *cores.Yaml) {
 
 //删除deployment
 func DeleteDeployment(data *cores.Yaml) {
-	//clientset, err := kubernetes.NewForConfig(config)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Println("deleting deployment...")
+	clientset := cores.Getset()
+	fmt.Printf("deleting deployment %q\n", data.Metadata.Name)
+	if err := clientset.AppsV1().Deployments(data.Metadata.Namespace).Delete(context.TODO(), data.Metadata.Name, metav1.DeleteOptions{}); err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("Deleted deployment %q\n", data.Metadata.Name)
 }
 
 //判断操作的deployment是否存在
@@ -71,6 +73,19 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 			}
 			revConPort = append(revConPort, tmpport)
 		}
+
+		//handing resource
+		//res:=map[apiv1.ResourceName]resource.Quantity
+		//res[]
+		//for m,n:=range data.Spec.Template.Spec.Containers[i].Resources.Requests{
+		//
+		//}
+		//
+		//tmplimit := apiv1.ResourceList{}
+		//tmpquest := apiv1.ResourceList{}
+		//
+		//tmpresource := apiv1.ResourceRequirements{}
+
 		tempcon := apiv1.Container{
 			Name:       data.Metadata.Name + "-c" + strconv.Itoa(i),
 			Image:      v.Image,
@@ -82,20 +97,21 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 		revcontainer = append(revcontainer, tempcon)
 	}
 
-	var dpobj metav1.ObjectMeta = metav1.ObjectMeta{
-		Name:      data.Metadata.Name,
-		Namespace: data.Metadata.Namespace,
-		Labels:    data.Metadata.Labels,
-	}
 	var tmpobj metav1.ObjectMeta = metav1.ObjectMeta{
 		Name:   data.Metadata.Name,
 		Labels: data.Spec.Template.Metadata.Labels,
 	}
 
 	var tmpspec apiv1.PodSpec = apiv1.PodSpec{
+		Hostname:   data.Metadata.Namespace + "pod",
 		Containers: revcontainer,
 	}
 
+	var dpobj metav1.ObjectMeta = metav1.ObjectMeta{
+		Name:      data.Metadata.Name,
+		Namespace: data.Metadata.Namespace,
+		Labels:    data.Metadata.Labels,
+	}
 	var dpspec appsv1.DeploymentSpec = appsv1.DeploymentSpec{
 		Replicas: &data.Spec.Replicas,
 		Selector: &metav1.LabelSelector{

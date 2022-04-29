@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
 	"k8s/common"
 	"k8s/cores"
+	"log"
 	"strconv"
 )
 
@@ -33,13 +36,45 @@ func startServer(port int, done chan bool) {
 func parseargs(resp []byte) {
 	data := new(cores.Yaml)
 	yaml.Unmarshal(resp, data)
-	if data.Kind == "Deployment" {
-		if common.DeploymentExistJudge(data) {
-			common.UpdateDeployment(data)
-		} else {
-			common.CreateDeployment(data)
+	lins, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("data:\t", string(lins))
+
+	switch data.Operation {
+	case "apply":
+		switch data.Kind {
+		case "Deployment":
+			if common.DeploymentExistJudge(data) {
+				common.UpdateDeployment(data)
+			} else {
+				common.CreateDeployment(data)
+			}
+		case "Service":
+			if common.ServiceExistJudge(data) {
+				common.UpdateService(data)
+			} else {
+				common.CreateService(data)
+			}
 		}
+	case "delete":
+		switch data.Kind {
+		case "Deployment":
+			if common.DeploymentExistJudge(data) {
+				common.DeleteDeployment(data)
+			} else {
+				fmt.Printf("Deployment %q not exists\n", data.Metadata.Name)
+			}
+		case "Service":
+			if common.ServiceExistJudge(data) {
+				common.DeleteService(data)
+			} else {
+				fmt.Printf("Service %q not exists\n", data.Metadata.Name)
+			}
+		}
+	case "list":
+		
 	}
-	if data.Kind == "Service" {
-	}
+
 }
