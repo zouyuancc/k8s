@@ -6,7 +6,7 @@ metadata:
       app: myweb
       cpp: web
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     app: myweb
   template:
@@ -17,7 +17,8 @@ spec:
       containers:
         - image: docker.io/tomcat:7
           name: myweb
-          command: "while true;do echo hello;sleep 10;done"
+          command: ["/bin/sh"]
+          args: ["-c","while true;do echo hello;sleep 10;done"]
           resources:
             requests:
               memory: 128Mi
@@ -26,4 +27,16 @@ spec:
               memory: 1G
               cpu: 2
           ports: 
+          - containerPort: 8080
+        - image: ustc.mcc.com/library/myapp:v1
+          name: myweb
+          command: "while true;do echo hello;sleep 10;done"
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 1
+            limits:
+              memory: 1G
+              cpu: 2
+          ports:
             containerPort: 8080
