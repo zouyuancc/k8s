@@ -19,11 +19,17 @@ type Yaml struct {
 				Containers []struct {
 					Image string `yaml:"image"`
 					Name  string `yaml:"name"`
-					Ports struct {
+					Ports []struct {
+						Name          string
+						HostPort      int32
 						ContainerPort int32 `yaml:"containerPort"`
+						Protocol      string
+						HostIP        string
 					}
-					Command   string `yaml:"command"`
-					Resources struct {
+					Command    []string `yaml:"command"`
+					Args       []string
+					WorkingDir string
+					Resources  struct {
 						Requests struct {
 							Memory string `yaml:"memory"`
 							Cpu    string `yaml:"cpu"`
