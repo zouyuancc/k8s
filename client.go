@@ -6,78 +6,111 @@ import (
 	"github.com/pebbe/zmq4"
 	"io/ioutil"
 	"os"
-	"os/user"
+	user2 "os/user"
 	"strconv"
 )
 
-func startClient(port int, done chan bool, msg []byte) {
-	// REQ  表示client端
-	socket, _ := zmq4.NewSocket(zmq4.REQ)
-	//绑定端口，指定传输层协议
-	socket.Connect("tcp://127.0.0.1:" + strconv.Itoa(port))
-	fmt.Printf("connect to server\n")
-	defer socket.Close()
+var file string
+var operation string
+var serverIp string
+var serverPort int
+var doneClient chan bool
 
-	socket.SendBytes(msg, zmq4.DONTWAIT)
-	socket.RecvBytes(0)
-	//fmt.Printf("%s", rec)
-	done <- true
+func init() {
+	flag.StringVar(&file, "f", "examples/tomcat-dp.yaml", "Input your yaml file")
+	flag.StringVar(&operation, "op", "apply", "Input you operation,like \"apply,delete and so on\"")
+	flag.StringVar(&serverIp, "ip", "127.0.0.1", "Input you remote ip address default 127.0.0.1")
+	flag.IntVar(&serverPort, "port", 20000, "Input the remote server port to connect,default value 20000")
 }
 
-func main() {
-	if len(os.Args) < 4 {
-		fmt.Println("Your input args is too less,it should be at least 4 paramemters just like\n 'kubectl create -f xxx.yaml'")
-		return
-	}
-	var file string
-	flag.StringVar(&file, "f", "examples/tomcat-dp.yaml", "Input your yaml file")
-	flag.Parse()
+type Client struct {
+	Ip   string
+	Port int
 
-	var init func(op string)
-	init = func(op string) {
-		u, _ := user.Current()
-		user := []byte("user: " + u.Name)
-		operation := []byte("\noperation: " + op)
-		done := make(chan bool)
-		buff, _ := ioutil.ReadFile(file)
-		buff = append(buff, user...)
-		buff = append(buff, operation...)
-		go startClient(20000, done, buff)
-		<-done
-	}
+	socket *zmq4.Socket
+}
 
-	switch os.Args[1] {
+func NewClient(ip string, port int) *Client {
+	client := &Client{
+		Ip:   ip,
+		Port: port,
+	}
+	socket, _ := zmq4.NewSocket(zmq4.REQ)
+	client.socket = socket
+	err := client.socket.Connect("tcp://" + ip + ":" + strconv.Itoa(port))
+	if err != nil {
+		fmt.Println("client connect err:", err)
+		return nil
+	}
+	return client
+}
+
+func (client *Client) FileMethod() {
+	defer client.socket.Close()
+	u, _ := user2.Current()
+	user := []byte("user: " + u.Name)
+	operation := []byte("\noperation: " + operation)
+	buff, _ := ioutil.ReadFile(file)
+	buff = append(buff, user...)
+	buff = append(buff, operation...)
+
+	client.socket.SendBytes(buff, zmq4.DONTWAIT)
+	data, _ := client.socket.RecvBytes(0)
+	fmt.Println(string(data))
+	doneClient <- true
+}
+
+func (client *Client) CliMethod() {
+	defer client.socket.Close()
+
+}
+
+func (client *Client) JudgeOption() {
+	switch operation {
 	case "apply":
-		switch os.Args[2] {
-		case "-f":
-			_, err := os.Stat(os.Args[3])
-			if err != nil {
-				fmt.Println("Your input file is not exists")
-				return
-			}
-			init("apply")
-		case "-i":
+		switch file {
+		case "":
 
 		default:
-			fmt.Println("input error -> go for help")
-		}
-	case "delete":
-		switch os.Args[2] {
-		case "-f":
-			_, err := os.Stat(os.Args[3])
+			_, err := os.Stat(file)
 			if err != nil {
 				fmt.Println("Your input file is not exists")
+				doneClient <- false
+				return
+			}
+			client.FileMethod()
+		}
+	case "delete":
+		switch file {
+		case "":
+
+		default:
+			_, err := os.Stat(file)
+			if err != nil {
+				fmt.Println("Your input file is not exists")
+				doneClient <- false
 				return
 			}
 			fmt.Println(file)
-			init("delete")
-		case "-i":
-
-		default:
-			fmt.Println("input error -> go for help")
+			client.FileMethod()
 		}
 	default:
 		fmt.Println("operation err go for help")
 	}
+}
 
+func (client *Client) Response() {
+	resp, _ := client.socket.Recv(0)
+	fmt.Println(resp)
+	client.socket.Send("recvived", 0)
+}
+
+func main() {
+	flag.Parse()
+
+	client := NewClient(serverIp, serverPort)
+	doneClient = make(chan bool, 1)
+	client.JudgeOption()
+	go client.Response()
+	<-doneClient
 }
