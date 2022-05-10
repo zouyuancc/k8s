@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	yaml "gopkg.in/yaml.v2"
 	"k8s/common"
 	"k8s/cores"
-	"log"
 	"strconv"
 )
 
@@ -43,9 +41,9 @@ func (server *Server) Start(done chan bool) {
 	for {
 		//Recv 和 Send必须交替进行
 		resp, _ := server.socket.Recv(0)
-		go server.Parseargs([]byte(resp))
-		fmt.Println("ok,receive")
-		server.socket.Send("We have received your  task request!", 0)
+		if resp != "" {
+			go server.Parseargs([]byte(resp))
+		}
 	}
 	done <- true
 
@@ -61,13 +59,14 @@ func main() {
 
 //解析从client端收过来的信息
 func (server *Server) Parseargs(resp []byte) {
+	strback := ""
 	data := new(cores.Yaml)
 	yaml.Unmarshal(resp, data)
-	lins, err := json.Marshal(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("data:\t", string(lins))
+	//lins, err := json.Marshal(data)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println("data:\t", string(lins))
 
 	switch data.Operation {
 	case "apply":
@@ -78,13 +77,16 @@ func (server *Server) Parseargs(resp []byte) {
 			} else {
 				common.CreateDeployment(data)
 			}
+			break
 		case "Service":
 			if common.ServiceExistJudge(data) {
 				common.UpdateService(data)
 			} else {
 				common.CreateService(data)
 			}
+			break
 		}
+		break
 	case "delete":
 		switch data.Kind {
 		case "Deployment":
@@ -93,21 +95,28 @@ func (server *Server) Parseargs(resp []byte) {
 			} else {
 				fmt.Printf("Deployment %q not exists\n", data.Metadata.Name)
 			}
+			break
 		case "Service":
 			if common.ServiceExistJudge(data) {
 				common.DeleteService(data)
 			} else {
 				fmt.Printf("Service %q not exists\n", data.Metadata.Name)
 			}
+			break
 		}
+		break
 	case "list":
 		switch data.Kind {
-		case "Deployment":
-
-		case "Service":
+		case "deployment":
+			strback += common.DeploymentList(data)
+			break
+		case "service":
+			strback += common.ServiceList(data)
+			break
 
 		}
+		break
 
 	}
-
+	server.socket.Send(strback, 0)
 }
