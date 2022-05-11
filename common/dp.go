@@ -59,6 +59,26 @@ func DeploymentExistJudge(data *cores.Yaml) bool {
 	return true
 }
 
+//查看deployment列表
+func DeploymentList(data *cores.Yaml) string {
+	dplist := ""
+	clientset := cores.Getset()
+	namespace := data.Metadata.Namespace
+	deployments, _ := clientset.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{})
+	dplist += "deploymnet_name\t\t\tREADY\t\tUP-TO-DATE\t\tAVAILABLE\t\tAGE\n"
+	for _, deployment := range deployments.Items {
+		dplist += fmt.Sprintf("%-9.8s\t\t\t%d/%d\t\t%d\t\t\t%d\t\t\t%s\n",
+			//fmt.Printf("%-9.8s\t\t\t%d/%d\t\t%d\t\t\t%d\t\t\t%s\n",
+			deployment.Name,
+			deployment.Status.ReadyReplicas, deployment.Status.Replicas,
+			deployment.Status.UpdatedReplicas,
+			deployment.Status.AvailableReplicas,
+			deployment.CreationTimestamp,
+		)
+	}
+	return dplist
+}
+
 func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 	revcontainer := []apiv1.Container{}
 	for i, v := range data.Spec.Template.Spec.Containers {
@@ -73,18 +93,6 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 			}
 			revConPort = append(revConPort, tmpport)
 		}
-
-		//handing resource
-		//res:=map[apiv1.ResourceName]resource.Quantity
-		//res[]
-		//for m,n:=range data.Spec.Template.Spec.Containers[i].Resources.Requests{
-		//
-		//}
-		//
-		//tmplimit := apiv1.ResourceList{}
-		//tmpquest := apiv1.ResourceList{}
-		//
-		//tmpresource := apiv1.ResourceRequirements{}
 
 		tempcon := apiv1.Container{
 			Name:       data.Metadata.Name + "-c" + strconv.Itoa(i),

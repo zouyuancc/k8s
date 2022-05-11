@@ -47,6 +47,26 @@ func ServiceExistJudge(data *cores.Yaml) bool {
 	return true
 }
 
+//查看server列表
+func ServiceList(data *cores.Yaml) string {
+	svclist := ""
+	clientset := cores.Getset()
+	namespace := data.Metadata.Namespace
+	services, _ := clientset.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{})
+	svclist += fmt.Sprintf("%-12s\t%-12s\t%-12s\t%-12s\t%-12s\n", "service_name", "type", "clusterIp", "port", "age")
+	for _, service := range services.Items {
+		svclist += fmt.Sprintf("%-12s\t%-12s\t%-12s\t%-12d\t%-12s\n",
+			service.Name,
+			service.Spec.Type,
+			service.Spec.ClusterIP,
+			service.Spec.Ports[0].Port,
+			service.CreationTimestamp,
+		)
+
+	}
+	return svclist
+}
+
 func svc_trans_to_kubernetes_struct(data *cores.Yaml) *v1.Service {
 	specports := []v1.ServicePort{}
 	for _, v := range data.Spec.Ports {
