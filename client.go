@@ -165,7 +165,7 @@ func (client Cclient) menu() {
 	fmt.Println("----------帮助----------")
 	fmt.Println("0.查看帮助文档")
 	fmt.Println("1.使用当前传入配置（参数+文件）配置集群任务")
-	fmt.Println("2.更改任务启动使用的yaml配置文件")
+	fmt.Println("2.更改任务启动使用的yaml配置文件以及集群操作operation(delete、apply、list)")
 	fmt.Println("3.查询在线用户")
 	fmt.Println("4.查看指定用户任务记录")
 	fmt.Println("11.退出")
@@ -192,6 +192,13 @@ func (client Cclient) view_all_users() {
 	client.conn.Write([]byte(msg))
 }
 
+func (client Cclient) modify() {
+	fmt.Println("请输入新的集群操作（delete、apply、list）:")
+	fmt.Scan(&operation)
+	fmt.Println("请输入想要使用的yaml文件（delete、apply、list）:")
+	fmt.Scan(&file)
+}
+
 func (client Cclient) Run() {
 	client.menu()
 	var sign int
@@ -209,7 +216,8 @@ func (client Cclient) Run() {
 			InitTask()
 			break
 		case 2:
-			fmt.Println("更改任务启动使用的yaml配置文件")
+			fmt.Println("更改任务启动使用的yaml配置文件以及集群操作operation(delete、apply、list)")
+			client.modify()
 			break
 		case 3:
 			fmt.Println("查询在线用户")
