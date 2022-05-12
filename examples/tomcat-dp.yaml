@@ -18,8 +18,12 @@ spec:
       containers:
         - image: docker.io/tomcat:7
           name: myweb
-          command: ["/bin/sh"]
-          args: ["-c","while true;do echo hello;sleep 10;done"]
+          command: ["/bin/sh","-c"]
+          args:
+          - while true;
+            do echo hello;
+            sleep 10;
+            done;
           resources:
             requests:
               memory: "128Mi"
