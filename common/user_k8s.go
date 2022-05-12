@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	zmq "github.com/pebbe/zmq4"
 	"gopkg.in/yaml.v2"
@@ -71,6 +72,8 @@ func (user *User) Parseargs(resp []byte) {
 	strback := ""
 	data := new(cores.Yaml)
 	yaml.Unmarshal(resp, data)
+	lins, _ := json.Marshal(data)
+	fmt.Println(string(lins))
 
 	//用户上线
 	Fillstructure(user, data)
