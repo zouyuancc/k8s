@@ -25,9 +25,9 @@ var kind string
 var namespace string
 
 func init() {
-	flag.StringVar(&file, "f", "", "Input your yaml file")
-	flag.StringVar(&operation, "op", "list", "Input you operation,like \"apply,delete and so on\"")
-	flag.StringVar(&serverIp, "ip", "127.0.0.1", "Input you remote ip address default 127.0.0.1")
+	flag.StringVar(&file, "f", "examples/tomcat-dp.yaml", "Input your yaml file")
+	flag.StringVar(&operation, "op", "apply", "Input you operation,like \"apply,delete and so on\"")
+	flag.StringVar(&serverIp, "ip", "192.168.163.111", "Input you remote ip address default 127.0.0.1")
 	flag.IntVar(&serverPort1, "port1", 20000, "Input the remote server port to connect,default value 20000")
 	flag.IntVar(&serverPort2, "port2", 20001, "Input the remote server port to connect,default value 20000")
 	flag.StringVar(&kind, "kind", "service", "Input the kind of resources,default value 20000")
@@ -173,7 +173,7 @@ func (client Cclient) menu() {
 	fmt.Println("----------帮助----------")
 	fmt.Println("0.查看帮助文档")
 	fmt.Println("1.使用当前传入配置（参数+文件）配置集群任务")
-	fmt.Println("2.更改任务启动使用的yaml配置文件以及集群操作operation(delete、apply、list)----（tips:这一步知识修改配置，生效仍需要输入菜单中的1来配置）")
+	fmt.Println("2.更改任务启动使用的yaml配置文件以及集群操作operation(lisdelete、apply、t)----（tips:这一步知识修改配置，生效仍需要输入菜单中的1来配置）")
 	fmt.Println("3.查询在线用户")
 	fmt.Println("4.查看指定用户任务记录")
 	fmt.Println("11.退出")

@@ -36,13 +36,26 @@ type Yaml struct {
 					WorkingDir string
 					Resources  struct {
 						Requests struct {
-							Memory string `yaml:"memory"`
-							Cpu    string `yaml:"cpu"`
+							Memory    string `yaml:"memory"`
+							Cpu       string `yaml:"cpu"`
+							NvidiaGpu string `yaml:"nvidia.com/gpu"`
 						}
 						Limits struct {
-							Memory string `yaml:"memory"`
-							Cpu    string `yaml:"cpu"`
+							Memory    string `yaml:"memory"`
+							Cpu       string `yaml:"cpu"`
+							NvidiaGpu string `yaml:"nvidia.com/gpu"`
 						}
+					}
+					VolumeMount struct {
+						Name      string `yaml:"name"`
+						MountPath string `yaml:"mountPath"`
+					}
+				}
+				Volumes struct {
+					Name string `yaml:name`
+					Nfs  struct {
+						Path   string `yaml:path`
+						Server string `yaml:server`
 					}
 				}
 			}

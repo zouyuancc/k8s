@@ -4,8 +4,8 @@ metadata:
   name: myweb
   namespace: default
   labels:
-      app: myweb
-      cpp: web
+    app: myweb
+    cpp: web
 spec:
   replicas: 3
   selector:
@@ -21,22 +21,35 @@ spec:
           path: /data/nfs/rl-framework
           server: 192.168.4.18
       containers:
-        - image: zouyuan/test/framework:learner
+        - image: ustc.mcc.com/library/yaoxin/python3.8-cuda11.3:torch1.11-v2
           name: m0web
           command: ["/bin/sh","-c"]
-          args: ["python /zouyuan/actor.py --config /zouyuan/qbert_actor.yaml;sleep 100000000"]
+          args: ["mkdir /zouyuan;sleep 100000000"]
           resources:
             requests:
-              memory: "60Gi"
+              memory: "128Mi"
               cpu: "1"
               nvidia.com/gpu: "1"
             limits:
-              memory: "60Gi"
+              memory: "128Mi"
               cpu: "1"
               nvidia.com/gpu: "1"
           ports:
-          - containerPort: 8080
+            - containerPort: 8080
           volumeMounts:
             name: code-0
             mountPath: /zouyuan
-
+        - image: ustc.mcc.com/library/myapp:v1
+          name: m1web
+          command: "while true;do echo hello;sleep 10;done"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "1"
+              nvidia.com/gpu: "1"
+            limits:
+              memory: "128Mi"
+              cpu: "1"
+              nvidia.com/gpu: "1"
+          ports:
+            containerPort: 8080

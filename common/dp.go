@@ -5,11 +5,13 @@ import (
 	"fmt"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s/cores"
 	"strconv"
 )
+
+type ResourceName string
 
 //创建deployment
 func CreateDeployment(data *cores.Yaml) {
@@ -96,21 +98,57 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 		}
 
 		//resource
-		var resource apiv1.ResourceRequirements
-		for i,v:=range data.Spec.Template.Spec.Containers[i].Resources.Requests.{
+		var res apiv1.ResourceRequirements
+		resourceLimit := make(map[apiv1.ResourceName]resource.Quantity)
+		var tmpcpu apiv1.ResourceName = "cpu"
+		var tmpmem apiv1.ResourceName = "memory"
+		var tmpgpu apiv1.ResourceName = "nvidia.com/gpu"
 
+		resourceLimit[tmpcpu] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.Cpu))
+		resourceLimit[tmpmem] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.Memory))
+		resourceLimit[tmpgpu] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.NvidiaGpu))
+		res.Limits = resourceLimit
+
+		//request
+		resourceRequest := make(map[apiv1.ResourceName]resource.Quantity)
+		resourceRequest[tmpcpu] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.Cpu))
+		resourceRequest[tmpmem] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.Memory))
+		resourceRequest[tmpgpu] = resource.MustParse(string(data.Spec.Template.Spec.Containers[i].Resources.Limits.NvidiaGpu))
+		res.Requests = resourceRequest
+
+		volumemounts := []apiv1.VolumeMount{}
+		volumem := &apiv1.VolumeMount{
+			Name:      "code-0",
+			MountPath: "/zouyuan",
 		}
+		volumemounts = append(volumemounts, *volumem)
+
 		tempcon := apiv1.Container{
-			Name:       data.Metadata.Name + "-c" + strconv.Itoa(i),
-			Image:      v.Image,
-			Command:    v.Command,
-			Args:       v.Args,
-			WorkingDir: v.WorkingDir,
-			Ports:      revConPort,
-			Resources:
+			Name:         data.Metadata.Name + "-c" + strconv.Itoa(i),
+			Image:        v.Image,
+			Command:      v.Command,
+			Args:         v.Args,
+			WorkingDir:   v.WorkingDir,
+			Ports:        revConPort,
+			Resources:    res,
+			VolumeMounts: volumemounts,
 		}
 		revcontainer = append(revcontainer, tempcon)
 	}
+	//volumes
+	volumes := []apiv1.Volume{}
+	tmpnfs := &apiv1.NFSVolumeSource{
+		Path:   "/data/nfs/rl-framework",
+		Server: "192.168.4.18",
+	}
+	volumeSource := apiv1.VolumeSource{
+		NFS: tmpnfs,
+	}
+	volume := apiv1.Volume{
+		Name:         data.Spec.Template.Spec.Volumes.Name,
+		VolumeSource: volumeSource,
+	}
+	volumes = append(volumes, volume)
 
 	var tmpobj metav1.ObjectMeta = metav1.ObjectMeta{
 		Name:   data.Metadata.Name,
@@ -120,6 +158,7 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 	var tmpspec apiv1.PodSpec = apiv1.PodSpec{
 		Hostname:   data.Metadata.Namespace + "pod",
 		Containers: revcontainer,
+		Volumes:    volumes,
 	}
 
 	var dpobj metav1.ObjectMeta = metav1.ObjectMeta{
