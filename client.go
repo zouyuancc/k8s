@@ -12,7 +12,6 @@ import (
 	"os"
 	user2 "os/user"
 	"strconv"
-	"strings"
 )
 
 var file string
@@ -27,7 +26,7 @@ var namespace string
 func init() {
 	flag.StringVar(&file, "f", "examples/tomcat-dp.yaml", "Input your yaml file")
 	flag.StringVar(&operation, "op", "apply", "Input you operation,like \"apply,delete and so on\"")
-	flag.StringVar(&serverIp, "ip", "192.168.163.111", "Input you remote ip address default 127.0.0.1")
+	flag.StringVar(&serverIp, "ip", "127.0.0.1", "Input you remote ip address default 127.0.0.1")
 	flag.IntVar(&serverPort1, "port1", 20000, "Input the remote server port to connect,default value 20000")
 	flag.IntVar(&serverPort2, "port2", 20001, "Input the remote server port to connect,default value 20000")
 	flag.StringVar(&kind, "kind", "service", "Input the kind of resources,default value 20000")
@@ -109,15 +108,17 @@ func (client *Client) JudgeOption() {
 			client.FileMethod()
 		}
 	case "list":
-		switch file {
-		case "":
-			client.data.Kind = kind
-			client.data.Metadata.Namespace = namespace
-		default:
-			buf, _ := ioutil.ReadFile(file)
-			stri := string(buf)
-			strings.Split(stri, "")
-		}
+		//switch file {
+		//case "":
+		//	client.data.Kind = kind
+		//	client.data.Metadata.Namespace = namespace
+		//default:
+		//	buf, _ := ioutil.ReadFile(file)
+		//	stri := string(buf)
+		//	strings.Split(stri, "")
+		//}
+		client.data.Kind = kind
+		client.data.Metadata.Namespace = namespace
 		u, _ := user2.Current()
 		client.data.Operation = operation
 		client.data.User = u.Name
@@ -229,6 +230,7 @@ func (client Cclient) modify() {
 }
 
 func (client Cclient) Run() {
+	InitTask()
 	client.menu()
 	var sign int
 	fmt.Printf("请安装帮助输入选项(0 for help）：")
