@@ -69,9 +69,10 @@ func Fillstructure(user *User, data *cores.Yaml) {
 
 //解析从client端收过来的信息
 func (user *User) Parseargs(resp []byte) {
+	tmpb := []byte(string(resp))
 	strback := ""
 	data := new(cores.Yaml)
-	yaml.Unmarshal(resp, data)
+	yaml.Unmarshal(tmpb, data)
 	lins, _ := json.Marshal(data)
 	fmt.Println(string(lins))
 

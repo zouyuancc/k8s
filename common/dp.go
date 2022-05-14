@@ -6,6 +6,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/client-go/applyconfigurations/core/v1"
 	"k8s/cores"
 	"strconv"
 )
@@ -94,6 +95,11 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 			revConPort = append(revConPort, tmpport)
 		}
 
+		//resource
+		var resource apiv1.ResourceRequirements
+		for i,v:=range data.Spec.Template.Spec.Containers[i].Resources.Requests.{
+
+		}
 		tempcon := apiv1.Container{
 			Name:       data.Metadata.Name + "-c" + strconv.Itoa(i),
 			Image:      v.Image,
@@ -101,6 +107,7 @@ func dp_trans_to_kubernetes_struct(data *cores.Yaml) *appsv1.Deployment {
 			Args:       v.Args,
 			WorkingDir: v.WorkingDir,
 			Ports:      revConPort,
+			Resources:
 		}
 		revcontainer = append(revcontainer, tempcon)
 	}

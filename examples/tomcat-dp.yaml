@@ -19,11 +19,7 @@ spec:
         - image: docker.io/tomcat:7
           name: myweb
           command: ["/bin/sh","-c"]
-          args:
-          - while true;
-            do echo hello;
-            sleep 10;
-            done;
+          args: ["mkdir /testzouyuan","while true;","do echo hello;","sleep 10;"]
           resources:
             requests:
               memory: "128Mi"
