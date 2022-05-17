@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myweb
+  name: actor
   namespace: default
   labels:
-      app: myweb
-      cpp: web
+      app: actor
+      cpp: actor
 spec:
   replicas: 3
   selector:
-    app: myweb
+    app: actor
   template:
     metadata:
       labels:
-        app: myweb
+        app: actor
     spec:
       volumes:
         name: code-0
@@ -21,19 +21,19 @@ spec:
           path: /data/nfs/rl-framework
           server: 192.168.4.18
       containers:
-        - image: zouyuan/test/framework:learner
+        - image: zouyuan/test/framework:actor
           name: m0web
           command: ["/bin/sh","-c"]
-          args: ["python /zouyuan/actor.py --config /zouyuan/qbert_actor.yaml;sleep 100000000"]
+          args: ["python /zouyuan/actor.py --ip actor.default --config /zouyuan/qbert_actor.yaml;sleep 100000000"]
           resources:
             requests:
               memory: "60Gi"
               cpu: "1"
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "0"
             limits:
               memory: "60Gi"
               cpu: "1"
-              nvidia.com/gpu: "1"
+              nvidia.com/gpu: "0"
           ports:
           - containerPort: 8080
           volumeMounts:

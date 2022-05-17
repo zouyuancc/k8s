@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learner
+  namespace: default
+  labels:
+      app: learner
+      cpp: web
+spec:
+  replicas: 1
+  selector:
+    app: learner
+  template:
+    metadata:
+      labels:
+        app: learner
+    spec:
+      volumes:
+        name: code-0
+        nfs:
+          path: /data/nfs/rl-framework
+          server: 192.168.4.18
+      containers:
+        - image: zouyuan/test/framework:learner
+          name: m0web
+          command: ["/bin/sh","-c"]
+          args: ["python /zouyuan/actor.py --config /zouyuan/qbert_learner.yaml;sleep 100000000"]
+          resources:
+            requests:
+              memory: "60Gi"
+              cpu: "1"
+              nvidia.com/gpu: "1"
+            limits:
+              memory: "60Gi"
+              cpu: "1"
+              nvidia.com/gpu: "1"
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+            name: code-0
+            mountPath: /zouyuan
+  ports:
+    - port: 20000
+      name: task-port
+      targetPort: 20000
+    - port: 20001
+      name: user-port
+      targetPort: 20001
+    - port: 5000
+      name: data-port
+      targetPort: 5000
+    - port: 5001
+      name: param-port
+      targetPort: 5001
+
+
