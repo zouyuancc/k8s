@@ -87,6 +87,9 @@ func (user *User) Parseargs(resp []byte) {
 				UpdateDeployment(data)
 			} else {
 				CreateDeployment(data)
+				if data.Spec.Replicas == 1 {
+					CreateHLService(data)
+				}
 			}
 			break
 		case "Service":

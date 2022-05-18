@@ -7,7 +7,7 @@ metadata:
       app: actor
       cpp: actor
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     app: actor
   template:
@@ -24,7 +24,7 @@ spec:
         - image: zouyuan/test/framework:actor
           name: m0web
           command: ["/bin/sh","-c"]
-          args: ["python /zouyuan/actor.py --ip actor.default --config /zouyuan/qbert_actor.yaml;sleep 100000000"]
+          args: ["apt update;apt install dnsutils -y;lip=`nslookup learner.default| grep Address |grep -v '#' |awk '{print $2}'`;sed -i '/ip:/d' /zouyuan/examples/ppo/ant-v2_actor.yaml;sed -i \"4a \\ \\ ip: $lip\" /zouyuan/examples/ppo/ant-v2_actor.yaml;python /zouyuan/actor.py  --config /zouyuan/examples/ppo/ant-v2_actor.yaml;sleep 100000000"]
           resources:
             requests:
               memory: "60Gi"

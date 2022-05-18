@@ -24,7 +24,7 @@ var kind string
 var namespace string
 
 func init() {
-	flag.StringVar(&file, "f", "examples/tomcat-dp.yaml", "Input your yaml file")
+	flag.StringVar(&file, "f", "examples/learner.yaml", "Input your yaml file")
 	flag.StringVar(&operation, "op", "apply", "Input you operation,like \"apply,delete and so on\"")
 	flag.StringVar(&serverIp, "ip", "127.0.0.1", "Input you remote ip address default 127.0.0.1")
 	flag.IntVar(&serverPort1, "port1", 20000, "Input the remote server port to connect,default value 20000")

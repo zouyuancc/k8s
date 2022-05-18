@@ -24,7 +24,7 @@ spec:
         - image: zouyuan/test/framework:learner
           name: m0web
           command: ["/bin/sh","-c"]
-          args: ["python /zouyuan/actor.py --config /zouyuan/qbert_learner.yaml;sleep 100000000"]
+          args: ["python /zouyuan/learner.py --config /zouyuan/examples/ppo/ant-v2_learner.yaml;sleep 100000000"]
           resources:
             requests:
               memory: "60Gi"
