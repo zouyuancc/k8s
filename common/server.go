@@ -16,7 +16,7 @@ var port1 int
 var port2 int
 
 func init() {
-	flag.StringVar(&ip, "ip", "127.0.0.1", "Input the server ip,default 127.0.0.1")
+	flag.StringVar(&ip, "ip", "", "Input the server ip,default 127.0.0.1")
 	flag.IntVar(&port1, "port1", 20000, "Input the server port,default 20000")
 	flag.IntVar(&port2, "port2", 20001, "Input the server port,default 20000")
 }
@@ -118,7 +118,7 @@ func (server *Server) Start(done chan bool) {
 	socket, _ := zmq.NewSocket(zmq.REP)
 	user := NewUser(socket, server)
 	for {
-		user.Socket.Bind("tcp://" + ip + ":" + strconv.Itoa(port1))
+		user.Socket.Bind("tcp://" + server.Ip + ":" + strconv.Itoa(port1))
 		//Recv 和 Send必须交替进行
 		resp, _ := user.Socket.Recv(0)
 		if resp != "" {

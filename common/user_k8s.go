@@ -6,6 +6,7 @@ import (
 	zmq "github.com/pebbe/zmq4"
 	"gopkg.in/yaml.v2"
 	"k8s/cores"
+	"strings"
 	"time"
 )
 
@@ -87,7 +88,7 @@ func (user *User) Parseargs(resp []byte) {
 				UpdateDeployment(data)
 			} else {
 				CreateDeployment(data)
-				if data.Spec.Replicas == 1 {
+				if strings.Contains(data.Metadata.Name, "learn") || strings.Contains(data.Metadata.Name, "Learn") || strings.Contains(data.Metadata.Name, "LEARN") {
 					CreateHLService(data)
 				}
 			}
