@@ -26,9 +26,9 @@ var namespace string
 func init() {
 	flag.StringVar(&file, "f", "examples/learner.yaml", "Input your yaml file")
 	flag.StringVar(&operation, "op", "apply", "Input you operation,like \"apply,delete and so on\"")
-	flag.StringVar(&serverIp, "ip", "127.0.0.1", "Input you remote ip address default 127.0.0.1")
-	flag.IntVar(&serverPort1, "port1", 20000, "Input the remote server port to connect,default value 20000")
-	flag.IntVar(&serverPort2, "port2", 20001, "Input the remote server port to connect,default value 20000")
+	flag.StringVar(&serverIp, "ip", "192.168.4.18", "Input you remote ip address default 127.0.0.1")
+	flag.IntVar(&serverPort1, "port1", 30000, "Input the remote server port to connect,default value 20000")
+	flag.IntVar(&serverPort2, "port2", 30001, "Input the remote server port to connect,default value 20000")
 	flag.StringVar(&kind, "kind", "service", "Input the kind of resources,default value 20000")
 	flag.StringVar(&namespace, "nm", "default", "Input the namespace of resources,default value default")
 }
